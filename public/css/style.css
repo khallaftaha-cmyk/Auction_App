@@ -1,0 +1,374 @@
+/* Going once: styles.
+   Boldness is spent in one place: the price panel in the auction room.
+   Everything else stays quiet. */
+
+@font-face {
+  font-family: "Bricolage Grotesque";
+  src: url("../fonts/bricolage-grotesque-latin-wght-normal.woff2") format("woff2");
+  font-weight: 200 800;
+  font-display: swap;
+}
+
+:root {
+  color-scheme: light;
+  --paper: #f2f4f8;
+  --card: #ffffff;
+  --ink: #15203b;
+  --muted: #586179;
+  --line: #d3d9e5;
+  --chip: #e4e8f1;
+  --cobalt: #2442f5;
+  --cobalt-dark: #1b33c4;
+  --amber: #ffb703;
+  --alarm: #c8243a;
+  --win: #0f7a56;
+  /* one tint per auction type, so the type is recognised before it is read */
+  --english-bg: #e9edff;
+  --english-ink: #1b33c4;
+  --sealed-bg: #e3e6ef;
+  --sealed-ink: #2b3550;
+  --dutch-bg: #fff0c7;
+  --dutch-ink: #6b4a00;
+  --radius: 12px;
+  font-family: "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+button, input, select, textarea { font: inherit; color: inherit; }
+
+:focus-visible { outline: 3px solid var(--cobalt); outline-offset: 2px; }
+h1:focus { outline: none; }
+
+h1 {
+  margin: 0 0 0.4em;
+  font-size: clamp(1.9rem, 5vw, 2.8rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+}
+
+h2 { margin: 0; font-size: 1.15rem; font-weight: 700; }
+
+.lead { margin: 0 0 1.5rem; max-width: 60ch; color: var(--muted); font-size: 1.1rem; }
+
+/* ---------- top bar ---------- */
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 14px max(16px, calc((100vw - 1080px) / 2));
+  background: var(--card);
+  border-bottom: 1px solid var(--line);
+}
+
+.brand {
+  color: var(--ink);
+  white-space: nowrap;
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+
+.topbar-right { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 6px 18px; font-size: 0.9rem; }
+
+.conn { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); }
+.conn::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--amber); }
+.conn[data-state="live"]::before { background: var(--win); }
+.conn[data-state="offline"]::before { background: var(--alarm); }
+
+.link-btn {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--cobalt);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.link-btn:hover { color: var(--cobalt-dark); }
+
+/* ---------- layout ---------- */
+.view { max-width: 1080px; margin: 0 auto; padding: 32px 16px 80px; }
+.login { max-width: 560px; padding-top: 64px; }
+
+.stack { display: grid; gap: 16px; }
+
+/* ---------- forms ---------- */
+.field { display: grid; gap: 6px; }
+label, legend { font-weight: 600; }
+
+input[type="text"], input[type="number"], select, textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  background: var(--card);
+}
+input:hover, select:hover, textarea:hover { border-color: #aab3c6; }
+textarea { resize: vertical; }
+
+.form-error { min-height: 1.5em; margin: 0; color: var(--alarm); font-weight: 600; }
+.hint { margin: 10px 0 0; color: var(--muted); }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 18px;
+  border: 1.5px solid var(--ink);
+  border-radius: 8px;
+  background: transparent;
+  font-weight: 700;
+  cursor: pointer;
+}
+.btn:hover { background: rgba(21, 32, 59, 0.07); }
+.btn.primary { background: var(--cobalt); border-color: var(--cobalt); color: #fff; }
+.btn.primary:hover { background: var(--cobalt-dark); border-color: var(--cobalt-dark); }
+.btn:disabled, input:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ---------- auction type chips ---------- */
+.chip { padding: 2px 12px; border-radius: 999px; background: var(--chip); font-size: 0.85rem; font-weight: 600; }
+.type-chip.type-english { background: var(--english-bg); color: var(--english-ink); }
+.type-chip.type-sealed { background: var(--sealed-bg); color: var(--sealed-ink); }
+.type-chip.type-dutch { background: var(--dutch-bg); color: var(--dutch-ink); }
+
+/* ---------- lobby ---------- */
+.lobby-head { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-bottom: 20px; }
+.lobby-head h1 { margin: 0 auto 0 0; }
+
+.tabs { display: inline-flex; padding: 3px; border-radius: 10px; background: var(--chip); }
+.tab { padding: 7px 14px; border: 0; border-radius: 8px; background: transparent; color: var(--muted); font-weight: 600; cursor: pointer; }
+.tab[aria-pressed="true"] { background: var(--card); color: var(--ink); box-shadow: 0 1px 2px rgba(21, 32, 59, 0.15); }
+
+.lots { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+
+/* A lot looks like a ticket: the stub on the left carries the real lot number. */
+.lot-open {
+  position: relative;
+  display: grid;
+  grid-template-columns: 88px 1fr auto;
+  width: 100%;
+  padding: 0;
+  overflow: hidden;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card);
+  text-align: left;
+  cursor: pointer;
+}
+.lot-open:hover { border-color: var(--cobalt); }
+
+.stub {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 0;
+  border-right: 2px dashed #aeb9f5;
+  background: var(--english-bg);
+  color: var(--english-ink);
+  font-size: 0.8rem;
+  line-height: 1.1;
+}
+.stub-num { font-size: 1.7rem; font-weight: 800; letter-spacing: -0.02em; }
+
+.lot-body { display: flex; flex-direction: column; gap: 4px; min-width: 0; padding: 14px 16px 16px; }
+.lot-title { overflow: hidden; font-size: 1.15rem; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.lot-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; color: var(--muted); font-size: 0.9rem; }
+.lot-meta .chip { padding: 0 10px; font-size: 0.8rem; }
+.lot-bids { color: var(--muted); font-size: 0.9rem; }
+
+.lot-figure { display: flex; flex-direction: column; justify-content: center; gap: 2px; padding: 14px 18px 18px; text-align: right; }
+.lot-price { font-size: 1.4rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.lot-time { color: var(--muted); font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+
+.lot-card[data-status="closed"] .stub { border-right-color: var(--line); background: #eceef3; color: var(--muted); }
+.lot-card[data-status="closed"] .lot-price { color: var(--muted); }
+
+/* The thin bar at the bottom of a ticket is the time left. */
+.lot-timebar { position: absolute; right: 0; bottom: 0; left: 0; height: 4px; background: var(--chip); }
+.lot-timebar-fill { display: block; width: 100%; height: 100%; background: var(--cobalt); transition: width 0.25s linear; }
+.lot-timebar.urgent .lot-timebar-fill { background: var(--alarm); }
+
+.urgent { color: var(--alarm); font-weight: 700; }
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 28px 20px;
+  border: 1.5px dashed var(--line);
+  border-radius: var(--radius);
+  color: var(--muted);
+  text-align: center;
+}
+
+/* ---------- auction room ---------- */
+.back { margin-bottom: 20px; }
+
+.room { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; padding: 0; list-style: none; }
+.type-help { margin: -0.9rem 0 1.25rem; color: var(--muted); }
+
+/* The memorable element: a big cobalt price that flashes amber whenever it changes. */
+.price-panel {
+  margin: 4px 0 14px;
+  padding: 22px 26px 24px;
+  border-radius: 16px;
+  background: var(--cobalt);
+  color: #fff;
+}
+.price-panel[data-state="ended"] { background: var(--ink); }
+.price-panel[data-state="won"] { background: var(--win); }
+.price-panel.flash { animation: flash 1s ease-out; }
+
+@keyframes flash {
+  from { background: var(--amber); color: var(--ink); }
+}
+
+.panel-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 4px; }
+.price-label { margin: 0; font-weight: 600; opacity: 0.92; }
+.badge { padding: 2px 12px; border-radius: 999px; background: #fff; color: var(--win); font-size: 0.85rem; font-weight: 700; }
+
+.price { margin: 0; font-size: clamp(3rem, 12vw, 6.2rem); font-weight: 800; line-height: 1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.unit { margin-left: 0.3em; font-size: 0.28em; font-weight: 600; letter-spacing: 0; opacity: 0.85; }
+.price-sub { margin: 10px 0 0; opacity: 0.92; }
+
+/* Dutch auction: a track that empties as the price falls from the highest to the lowest price. */
+.drop { margin-top: 18px; }
+.drop-track { height: 10px; overflow: hidden; border-radius: 999px; background: rgba(255, 255, 255, 0.28); }
+.drop-fill { width: 100%; height: 100%; border-radius: 999px; background: #fff; transition: width 0.25s linear; }
+.drop-scale { display: flex; justify-content: space-between; margin-top: 6px; font-size: 0.85rem; opacity: 0.92; font-variant-numeric: tabular-nums; }
+
+.timebar { height: 6px; margin: 0 0 10px; overflow: hidden; border-radius: 999px; background: #dde2ec; }
+.timebar-fill { width: 100%; height: 100%; border-radius: 999px; background: var(--cobalt); transition: width 0.25s linear; }
+.timebar.urgent .timebar-fill { background: var(--alarm); }
+
+.clock { margin: 0 0 18px; color: var(--muted); font-size: 1.05rem; font-variant-numeric: tabular-nums; }
+.clock strong { color: var(--ink); }
+.clock strong.urgent { color: var(--alarm); }
+
+.bid-dock { margin-top: 4px; }
+.bid-form { display: grid; gap: 10px; max-width: 460px; }
+.bid-row { display: flex; gap: 10px; }
+.bid-row input { flex: 1; min-width: 0; font-size: 1.25rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.quick-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.quick-bid { padding: 6px 14px; border-color: var(--line); background: var(--card); font-variant-numeric: tabular-nums; }
+.quick-bid:hover { border-color: var(--cobalt); background: var(--english-bg); }
+
+.buy { width: 100%; max-width: 460px; padding: 16px 20px; font-size: 1.3rem; font-variant-numeric: tabular-nums; }
+
+.history { padding: 20px; border: 1.5px solid var(--line); border-radius: var(--radius); background: var(--card); }
+.bids { max-height: 440px; margin: 12px 0 0; padding: 0; overflow: auto; list-style: none; }
+.bid { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
+.bid:first-child { border-top: 0; }
+.bid.is-new { animation: bid-in 0.6s ease-out; }
+@keyframes bid-in {
+  from { opacity: 0; transform: translateY(-8px); background: #fff4cf; }
+}
+.bid-info { display: flex; flex-direction: column; }
+.bid-who { font-weight: 600; }
+.bid.is-me .bid-who::after { content: " (you)"; color: var(--muted); font-weight: 400; }
+.bid-time { color: var(--muted); font-size: 0.85rem; }
+.bid-amount { font-weight: 800; font-variant-numeric: tabular-nums; }
+.bid.is-top .bid-amount { color: var(--win); }
+.history .empty { margin-top: 12px; padding: 18px 14px; }
+
+/* ---------- dialog ---------- */
+dialog {
+  width: min(94vw, 600px);
+  padding: 0;
+  border: 0;
+  border-radius: 16px;
+  background: var(--card);
+  color: var(--ink);
+}
+dialog::backdrop { background: rgba(21, 32, 59, 0.55); }
+
+.dialog-form { display: grid; gap: 16px; padding: 24px; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.type-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; min-width: 0; margin: 0; padding: 0; border: 0; }
+.type-options legend { margin-bottom: 6px; padding: 0; }
+.type-option { position: relative; display: block; font-weight: 400; }
+.type-option input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.tile { display: block; height: 100%; padding: 12px; border: 1.5px solid var(--line); border-radius: 10px; }
+.tile strong { display: block; }
+.tile span { color: var(--muted); font-size: 0.88rem; line-height: 1.35; }
+.type-option input:checked + .tile { border-color: var(--cobalt); background: #f0f3ff; box-shadow: inset 0 0 0 1px var(--cobalt); }
+.type-option input:focus-visible + .tile { outline: 3px solid var(--cobalt); outline-offset: 2px; }
+
+.dialog-actions { display: flex; justify-content: flex-end; gap: 10px; }
+
+/* ---------- toasts ---------- */
+.toasts { position: fixed; bottom: 16px; left: 50%; z-index: 50; display: flex; flex-direction: column; gap: 8px; width: min(92vw, 440px); transform: translateX(-50%); }
+.toast {
+  padding: 12px 16px;
+  border: 0;
+  border-left: 6px solid var(--cobalt);
+  border-radius: 10px;
+  background: var(--ink);
+  box-shadow: 0 8px 24px rgba(21, 32, 59, 0.3);
+  color: #fff;
+  font-weight: 500;
+  text-align: left;
+  animation: toast-in 0.2s ease-out;
+}
+button.toast { cursor: pointer; }
+.toast.success { border-left-color: #35c58f; }
+.toast.warn { border-left-color: var(--amber); }
+.toast.error { border-left-color: #ff6b7d; }
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(8px); }
+}
+
+/* ---------- small screens ---------- */
+@media (max-width: 860px) {
+  .room { grid-template-columns: 1fr; }
+
+  /* On a phone the bid controls stay glued to the bottom of the screen. */
+  .bid-dock {
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    margin: 16px -16px 0;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    border-top: 1.5px solid var(--line);
+    background: var(--paper);
+  }
+  .toasts { top: 72px; bottom: auto; }
+}
+
+@media (max-width: 560px) {
+  .login { padding-top: 32px; }
+  .lot-open { grid-template-columns: 68px 1fr; }
+  .stub { grid-row: 1 / span 2; }
+  .lot-figure { grid-column: 2; flex-direction: row; align-items: baseline; justify-content: space-between; padding: 0 16px 16px; text-align: left; }
+  .row, .type-options { grid-template-columns: 1fr; }
+  .bid-row { flex-direction: column; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

@@ -1,0 +1,88 @@
+classDiagram
+  direction LR
+
+  class AuctionController {
+    +login(ws, data)
+    +listAuctions()
+    +joinAuction(ws, data)
+    +createAuction(ws, data)
+    +placeBid(ws, data)
+    +closeAuction(id)
+  }
+
+  class Auction { +create() +findById() +listRecent() +close() }
+  class Bid { +create() +forAuction() }
+  class User { +findOrCreate() }
+
+  class Database {
+    -instance$
+    +getInstance()$
+    +query(sql, params)
+  }
+  class AuctionManager {
+    -instance$
+    +getInstance()$
+    +join() +leave()
+    +broadcastAll() +broadcastRoom() +sendToUser()
+    +runExclusive() +scheduleClose()
+  }
+
+  class BiddingStrategy {
+    <<interface>>
+    +validateBid()
+    +determineWinner()
+    +minimumBid()
+    +publicPrice()
+    +visibleBids()
+    +resolveAmount()
+  }
+  class EnglishAuctionStrategy
+  class SealedBidStrategy
+  class DutchAuctionStrategy
+
+  class AuctionCreator {
+    <<abstract>>
+    +build(input, userId)
+    +createStrategy()*
+  }
+  class EnglishAuctionCreator
+  class SealedAuctionCreator
+  class DutchAuctionCreator
+
+  class Subject { +subscribe() +unsubscribe() +notify(event, data) }
+  class Observer {
+    <<interface>>
+    +update(event, data)
+  }
+  class BroadcastObserver
+  class OutbidObserver
+  class AuditLogObserver
+
+  AuctionController --> Auction : uses
+  AuctionController --> Bid : uses
+  AuctionController --> User : uses
+  AuctionController --> BiddingStrategy : asks
+  AuctionController --> Subject : notify
+  AuctionController --> AuctionManager : rooms and timers
+  Auction ..> Database
+  Bid ..> Database
+  User ..> Database
+
+  BiddingStrategy <|-- EnglishAuctionStrategy
+  BiddingStrategy <|-- SealedBidStrategy
+  BiddingStrategy <|-- DutchAuctionStrategy
+
+  AuctionCreator <|-- EnglishAuctionCreator
+  AuctionCreator <|-- SealedAuctionCreator
+  AuctionCreator <|-- DutchAuctionCreator
+  EnglishAuctionCreator ..> EnglishAuctionStrategy : creates
+  SealedAuctionCreator ..> SealedBidStrategy : creates
+  DutchAuctionCreator ..> DutchAuctionStrategy : creates
+  AuctionController --> AuctionCreator : createAuction
+
+  Subject o-- Observer
+  Observer <|-- BroadcastObserver
+  Observer <|-- OutbidObserver
+  Observer <|-- AuditLogObserver
+  BroadcastObserver --> AuctionManager
+  OutbidObserver --> AuctionManager

@@ -1,0 +1,22 @@
+sequenceDiagram
+  autonumber
+  actor Bob as Bob (browser)
+  participant MW as Middleware pipeline
+  participant C as AuctionController
+  participant S as BiddingStrategy
+  participant M as Models and MySQL
+  participant O as Observers
+  actor Others as Everyone else
+
+  Bob->>MW: { type: PLACE_BID, auctionId, amount }
+  MW->>MW: parse, log, rate limit, validate, authenticate
+  MW->>C: router calls placeBid()
+  C->>M: load auction and its bids
+  C->>S: validateBid()
+  S-->>C: ok (or an error is thrown)
+  C->>M: save the bid
+  C->>O: notify BID_PLACED
+  O-->>Others: BroadcastObserver sends AUCTION_UPDATED and NEW_BID
+  O-->>Others: OutbidObserver tells the previous leader
+  O->>O: AuditLogObserver writes the log line
+  C-->>Bob: BID_ACCEPTED

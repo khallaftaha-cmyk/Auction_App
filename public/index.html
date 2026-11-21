@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Going once: live auctions</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232442f5'/%3E%3Ctext x='16' y='23' font-size='20' font-weight='800' text-anchor='middle' fill='white' font-family='sans-serif'%3EG%3C/text%3E%3C/svg%3E">
+  <link rel="preload" href="fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="#" id="brand">Going once</a>
+  <div class="topbar-right">
+    <span class="conn" id="conn" data-state="connecting" role="status">Connecting…</span>
+    <span id="who" hidden>
+      Signed in as <strong id="username"></strong>
+      <button class="link-btn" id="switch-user" type="button">Switch name</button>
+    </span>
+  </div>
+</header>
+
+<main>
+
+  <!-- 1. LOGIN -->
+  <section class="view login" id="login-view">
+    <h1 tabindex="-1">Bid against your classmates, live.</h1>
+    <p class="lead">Pick a name and you're in. Open a second tab with a different name to bid against yourself.</p>
+    <form id="login-form" class="stack" novalidate>
+      <div class="field">
+        <label for="login-name">Your name</label>
+        <input id="login-name" name="username" type="text" maxlength="20" autocomplete="off" required>
+      </div>
+      <p class="form-error" id="login-error" role="alert"></p>
+      <button class="btn primary" type="submit">Join the auction</button>
+    </form>
+  </section>
+
+  <!-- 2. LOBBY -->
+  <section class="view" id="lobby-view" hidden>
+    <div class="lobby-head">
+      <h1 tabindex="-1">Auctions</h1>
+      <div class="tabs">
+        <button class="tab" type="button" data-tab="open" aria-pressed="true">Open <span id="count-open"></span></button>
+        <button class="tab" type="button" data-tab="closed" aria-pressed="false">Ended <span id="count-closed"></span></button>
+      </div>
+      <button class="btn primary" id="new-auction" type="button">New auction</button>
+    </div>
+    <ul class="lots" id="lots"></ul>
+    <div class="empty" id="lots-empty" hidden>
+      <span id="lots-empty-text"></span>
+      <button class="btn primary" id="empty-new" type="button">Start an auction</button>
+    </div>
+  </section>
+
+  <!-- 3. AUCTION ROOM -->
+  <section class="view" id="room-view" hidden>
+    <button class="link-btn back" id="back" type="button">Back to auctions</button>
+
+    <div class="room">
+      <article class="lot-detail">
+        <ul class="chips">
+          <li class="chip" id="room-lot"></li>
+          <li class="chip type-chip" id="room-type"></li>
+          <li class="chip" id="room-creator"></li>
+        </ul>
+        <h1 tabindex="-1" id="room-title"></h1>
+        <p class="lead" id="room-desc"></p>
+        <p class="type-help" id="room-help"></p>
+
+        <div class="price-panel" id="price-panel" data-state="open">
+          <div class="panel-top">
+            <p class="price-label" id="price-label"></p>
+            <span class="badge" id="price-badge" hidden>You are in the lead</span>
+          </div>
+          <p class="price" aria-live="polite"><span id="price-value"></span><span class="unit" id="price-unit">MAD</span></p>
+          <p class="price-sub" id="price-sub"></p>
+          <div class="drop" id="drop" hidden>
+            <div class="drop-track"><div class="drop-fill" id="drop-fill"></div></div>
+            <div class="drop-scale"><span id="drop-floor"></span><span id="drop-start"></span></div>
+          </div>
+        </div>
+
+        <div class="timebar" id="timebar" hidden><div class="timebar-fill" id="timebar-fill"></div></div>
+        <p class="clock"><span id="clock-label">Time left</span> <strong id="room-clock"></strong></p>
+
+        <div class="bid-dock" id="bid-dock">
+          <form id="bid-form" class="bid-form" novalidate>
+            <div class="field">
+              <label for="bid-amount">Your bid (MAD)</label>
+              <div class="bid-row">
+                <input id="bid-amount" type="number" inputmode="numeric" step="1" min="1" autocomplete="off">
+                <button class="btn primary" id="bid-submit" type="submit">Place bid</button>
+              </div>
+            </div>
+            <div class="quick-row" id="quick-row" role="group" aria-label="Quick bids"></div>
+          </form>
+          <button class="btn primary buy" id="buy-now" type="button" hidden></button>
+          <p class="hint" id="bid-hint"></p>
+        </div>
+      </article>
+
+      <aside class="history">
+        <h2>Bids</h2>
+        <ol class="bids" id="bids"></ol>
+        <p class="empty" id="bids-empty"></p>
+      </aside>
+    </div>
+  </section>
+
+</main>
+
+<!-- Create-auction dialog -->
+<dialog id="create-dialog" aria-labelledby="create-title">
+  <form id="create-form" class="dialog-form" novalidate>
+    <h2 id="create-title">New auction</h2>
+
+    <div class="field">
+      <label for="c-title">What are you selling?</label>
+      <input id="c-title" type="text" maxlength="100" required>
+    </div>
+
+    <div class="field">
+      <label for="c-desc">Description (optional)</label>
+      <textarea id="c-desc" rows="2" maxlength="500"></textarea>
+    </div>
+
+    <fieldset class="type-options">
+      <legend>Auction type</legend>
+      <label class="type-option">
+        <input type="radio" name="strategy" value="english" checked>
+        <span class="tile"><strong>English</strong><span>Open bids. Each one must beat the last.</span></span>
+      </label>
+      <label class="type-option">
+        <input type="radio" name="strategy" value="sealed">
+        <span class="tile"><strong>Sealed bid</strong><span>One secret bid each, revealed at the end.</span></span>
+      </label>
+      <label class="type-option">
+        <input type="radio" name="strategy" value="dutch">
+        <span class="tile"><strong>Dutch</strong><span>The price falls. The first to accept wins.</span></span>
+      </label>
+    </fieldset>
+
+    <div class="row">
+      <div class="field">
+        <label for="c-start" id="c-start-label">Starting price (MAD)</label>
+        <input id="c-start" type="number" min="1" step="1" value="100" required>
+      </div>
+      <div class="field" id="c-increment-field">
+        <label for="c-increment">Minimum raise (MAD)</label>
+        <input id="c-increment" type="number" min="1" step="1" value="10" required>
+      </div>
+      <div class="field" id="c-floor-field" hidden>
+        <label for="c-floor">Lowest price (MAD)</label>
+        <input id="c-floor" type="number" min="1" step="1" value="100">
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="c-duration">Duration</label>
+      <select id="c-duration">
+        <option value="30">30 seconds (quick demo)</option>
+        <option value="60">1 minute</option>
+        <option value="120" selected>2 minutes</option>
+        <option value="300">5 minutes</option>
+        <option value="900">15 minutes</option>
+        <option value="3600">1 hour</option>
+        <option value="86400">24 hours</option>
+      </select>
+    </div>
+
+    <p class="form-error" id="create-error" role="alert"></p>
+
+    <div class="dialog-actions">
+      <button class="btn" type="button" id="create-cancel">Cancel</button>
+      <button class="btn primary" type="submit">Start auction</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<template id="lot-template">
+  <li class="lot-card">
+    <button class="lot-open" type="button">
+      <span class="stub"><span class="stub-label">Lot</span><span class="stub-num"></span></span>
+      <span class="lot-body">
+        <span class="lot-title"></span>
+        <span class="lot-meta"><span class="chip type-chip"></span><span class="lot-seller"></span></span>
+        <span class="lot-bids"></span>
+      </span>
+      <span class="lot-figure">
+        <span class="lot-price"></span>
+        <span class="lot-time"></span>
+      </span>
+      <span class="lot-timebar" aria-hidden="true"><span class="lot-timebar-fill"></span></span>
+    </button>
+  </li>
+</template>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
